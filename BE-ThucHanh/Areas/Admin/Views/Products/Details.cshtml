@@ -1,0 +1,39 @@
+﻿@model BE_ThucHanh.Models.Product
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_layout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Product</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>tên sản phẩm</dt>
+
+        <dd>@Html.DisplayFor(model => model.ProductName)</dd>
+
+        <dt>Đơn giá</dt>
+
+        <dd>@Html.DisplayFor(model => model.ProductPrice)</dd>
+
+        <dt>Hình ảnh</dt>
+
+        <dd>@Html.DisplayFor(model => model.ProductImage)</dd>
+
+        <dt>Mô tả</dt>
+
+        <dd>@Html.DisplayFor(model => model.ProductDescription)</dd>
+
+        <dt>Danh mục</dt>
+
+        <dd>@Html.DisplayFor(model => model.Category.CategoryName)</dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ProductID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
