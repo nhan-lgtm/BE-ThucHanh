@@ -2,35 +2,34 @@
 
 @{
     ViewBag.Title = "Delete";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_Adminlayout.cshtml";
 }
 
 <h2 class="bg-success">XÓA DANH MỤC</h2>
 
-@using (Html.BeginForm())
-        {
-        @Html.AntiForgeryToken()
-<div class="form-horizontal">
-    <hr />
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <h4>Bạn có chắc chắn muốn xóa danh mục này không?</h4>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="control-label col-md-2">Tên danh mục</div>
-        <div class="col-md-10">
-            @* Hiển thị giá trị của CategoryName *@
-            @Html.DisplayFor(model => model.CategoryName)
-        </div>
-
+@using (Html.BeginForm()) 
+  {
+            @Html.AntiForgeryToken()
+    <div class="form-horinzontal">
+        <hr />
         <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Xóa" class="btn btn-primary" /> |
-                @Html.ActionLink("Quay lại danh sách", "Index", null, new { @class = "btn btn-primary" })
+            <div class="col-md-offset-2 col-md-10" style="margin-top: 15px;">
+                <h4 class="bg-danger"> bạn có chắc chắn muốn xóa danh mục này không ?</h4>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="control-label col-md-2">Tên danh mục</div>
+            <div class="col-md-10">
+                @* Hiển thị giá trị của CategoryName  *@
+                @Html.DisplayFor(model => model.CategoryName)
+            </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10" style="margin-top: 15px;">
+                    <input type="submit" value="Xóa" class="btn btn-primary btn-sm" /> |
+                    @Html.ActionLink("Quay lại danh sách", "Index", null, new { @class = "btn btn-primary btn-sm" })
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-        }
+   }

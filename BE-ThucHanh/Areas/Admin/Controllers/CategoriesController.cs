@@ -15,14 +15,14 @@ namespace BE_ThucHanh.Areas.Admin.Controllers
         private MyStoreEntities db = new MyStoreEntities();
 
         // GET: Admin/Categories
-        // GET: Lấy dữ liệu từ bảng Category trong DataBase hiển thị lên 
+        //GET: lấy dữ liệu từ bảng Catergory trong DB để hiển thị lên
         public ActionResult Index()
         {
             return View(db.Categories.ToList());
         }
 
         // GET: Admin/Categories/Details/5
-        // Details: lấy chi tiết một bản ghi có CategoryID = id 
+        // Details: lấy chi tiết một bản ghi có CatergoryID = id
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -30,23 +30,23 @@ namespace BE_ThucHanh.Areas.Admin.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest); // mã lỗi 400: thiếu giá trị truyền vào
             }
             Category category = db.Categories.Find(id);
-            if (category == null) //không tìm thấy bản ghi
+            if (category == null) // không tìm thấy bản ghi
             {
-                return HttpNotFound(); // mã lỗi 404
+                return HttpNotFound(); // mã lối 404 
             }
             return View(category);
         }
 
         // GET: Admin/Categories/Create
-        // Load form Create 
-        // [httpGet] là phương thức mặc định , nên không cần khai báo từ khóa
+        // Load form create
+        //[HttpGet] là phương thức mặc định, nên không cần khai báo từ khóa
         public ActionResult Create()
         {
             return View();
         }
 
         // POST: Admin/Categories/Create
-        // POST: lưu dữ liệu nhập từ form Create vào Database
+        // POST: lưu dữ liệu vào từ form Create vào DB
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -64,10 +64,9 @@ namespace BE_ThucHanh.Areas.Admin.Controllers
         }
 
         // GET: Admin/Categories/Edit/5
-        // GET: Lấy dữ liệu của một danh mục đã có sao cho CategoryID = id
+        //GET: lấy dữ liệu của một danh mục đã có sao chép cho Catergory = id
         public ActionResult Edit(int? id)
         {
-            Details (id);
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
