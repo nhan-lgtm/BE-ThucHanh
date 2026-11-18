@@ -150,6 +150,7 @@
     <Compile Include="Models\ViewModel\CartService.cs" />
     <Compile Include="Models\ViewModel\ChangePasswordVM.cs" />
     <Compile Include="Models\ViewModel\LoginVM.cs" />
+    <Compile Include="Models\ViewModel\MyOrderVM.cs" />
     <Compile Include="Models\ViewModel\PartialClasses.cs" />
     <Compile Include="Models\ViewModel\Metadata.cs" />
     <Compile Include="Models\MyStoreModel.Context.cs">

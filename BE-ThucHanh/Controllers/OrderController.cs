@@ -2,6 +2,7 @@
 using BE_ThucHanh.Models.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.Validation;
 using System.Diagnostics;
@@ -15,6 +16,9 @@ namespace BE_ThucHanh.Controllers
     public class OrderController : Controller
     {
         private MyStoreEntities db = new MyStoreEntities();
+
+        private const int PreviewCount = 2;   // mỗi trạng thái chỉ hiện 2 đơn gần nhất
+        private const int MaxCount = 50;      // bấm "Xem thêm" thì hiện tối đa 50 đơn gần nhất
 
         // Lấy dịch vụ giỏ hàng (giống CartController)
         private CartService GetCartService()
@@ -141,15 +145,103 @@ namespace BE_ThucHanh.Controllers
             return View(order);
         }
 
-        // GET: Order/MyOrder
-        // Danh sách đơn hàng đã đặt của khách đang đăng nhập
-        public ActionResult MyOrder()
+        // GET: Order/MyOrder?tab=all&searchTerm=...&showAll=false
+        // Trang "Đơn hàng của tôi": tìm kiếm, các tab theo trạng thái, 2 đơn gần nhất / tối đa 50 đơn
+        public ActionResult MyOrder(string tab = "all", string searchTerm = null, bool showAll = false)
         {
-            var orders = db.Orders
-                .Where(o => o.Customer.Username == User.Identity.Name)
-                .OrderByDescending(o => o.OrderDate)
-                .ToList();
-            return View(orders);
+            var customer = db.Customers.FirstOrDefault(c => c.Username == User.Identity.Name);
+            if (customer == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            tab = OrderStatuses.NormalizeTab(tab);
+
+            // Toàn bộ đơn của khách này
+            var myOrders = db.Orders
+                .Include("OrderDetails.Product.Category")
+                .Where(o => o.CustomerID == customer.CustomerID);
+
+            var model = new MyOrderVM
+            {
+                SearchTerm = searchTerm,
+                Tab = tab,
+                ShowAll = showAll,
+                HasAnyOrder = myOrders.Any()
+            };
+
+            // Tìm theo Mã đơn hàng hoặc Tên sản phẩm
+            var query = myOrders;
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                string term = searchTerm.Trim();
+                int orderId;
+                if (int.TryParse(term, out orderId))
+                {
+                    query = query.Where(o => o.OrderID == orderId
+                        || o.OrderDetails.Any(d => d.Product.ProductName.Contains(term)));
+                }
+                else
+                {
+                    query = query.Where(o => o.OrderDetails.Any(d => d.Product.ProductName.Contains(term)));
+                }
+            }
+
+            // Đơn mới nhất lên trước
+            var orders = query.OrderByDescending(o => o.OrderDate)
+                              .ThenByDescending(o => o.OrderID)
+                              .ToList();
+
+            if (tab == "all")
+            {
+                // Tab Tất cả đơn: hiện tất cả, gom nhóm theo trạng thái
+                // (OrderBy của LINQ to Objects giữ nguyên thứ tự ngày trong cùng một nhóm)
+                orders = orders.OrderBy(o => OrderStatuses.IndexOf(OrderStatuses.KeyOf(o.PaymentStatus))).ToList();
+                model.TotalInTab = orders.Count;
+            }
+            else
+            {
+                // Các tab còn lại: lọc theo trạng thái, mặc định 2 đơn gần nhất, "Xem thêm" thì tối đa 50 đơn
+                orders = orders.Where(o => OrderStatuses.KeyOf(o.PaymentStatus) == tab).ToList();
+                model.TotalInTab = orders.Count;
+                orders = orders.Take(showAll ? MaxCount : PreviewCount).ToList();
+            }
+
+            model.Orders = orders;
+            return View(model);
+        }
+
+        // GET: Order/Reorder/5
+        // Nút MUA LẠI: thêm các sản phẩm của đơn vào giỏ hàng, số lượng = 1
+        public ActionResult Reorder(int id)
+        {
+            var customer = db.Customers.FirstOrDefault(c => c.Username == User.Identity.Name);
+            if (customer == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Chỉ cho mua lại đơn của chính mình
+            var order = db.Orders
+                .Include("OrderDetails.Product.Category")
+                .FirstOrDefault(o => o.OrderID == id && o.CustomerID == customer.CustomerID);
+            if (order == null)
+            {
+                return HttpNotFound();
+            }
+
+            var cart = GetCartService().GetCart();
+            foreach (var detail in order.OrderDetails)
+            {
+                var product = detail.Product;
+                if (product == null) continue;
+
+                cart.AddItem(product.ProductID, product.ProductImage, product.ProductName,
+                    product.ProductPrice, 1,
+                    product.Category != null ? product.Category.CategoryName : "");
+            }
+
+            return RedirectToAction("Index", "Cart");
         }
 
         protected override void Dispose(bool disposing)

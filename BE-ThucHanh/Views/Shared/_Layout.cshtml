@@ -1,99 +1,93 @@
-﻿@{
-    // Trạng thái đăng nhập và số mặt hàng trong giỏ để hiển thị trên menu
-    var isLoggedIn = User.Identity.IsAuthenticated;
-    var cart = Session["Cart"] as BE_ThucHanh.Models.ViewModel.Cart;
-    int cartCount = cart != null ? System.Linq.Enumerable.Count(cart.Items) : 0;
-}
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - MyStore</title>
-    @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+﻿    @{
+        // Trạng thái đăng nhập và số mặt hàng trong giỏ để hiển thị trên menu
+        var isLoggedIn = User.Identity.IsAuthenticated;
+        var cart = Session["Cart"] as BE_ThucHanh.Models.ViewModel.Cart;
+        int cartCount = cart != null ? System.Linq.Enumerable.Count(cart.Items) : 0;
+    }
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>@ViewBag.Title - MyStore</title>
+        @Styles.Render("~/Content/css")
+        @Scripts.Render("~/bundles/modernizr")
 
-    @RenderSection("styles", required: false)
-</head>
-<body>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
-        <div class="container">
-            @* Phía khách hàng: area = "" (không thuộc Area Admin) *@
-            @Html.ActionLink("MyStore", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li>@Html.ActionLink("Trang chủ", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    @* Giỏ hàng + số lượng mặt hàng *@
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "Cart", new { area = "" })">
-                            Giỏ hàng
-                            @if (cartCount > 0)
-                            {
-                                <span class="badge bg-danger">@cartCount</span>
-                            }
-                        </a>
-                    </li>
-                    @* Đơn hàng đã đặt của khách (chỉ hiện khi đã đăng nhập) *@
-                    @if (isLoggedIn)
-                    {
+        @RenderSection("styles", required: false)
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+            <div class="container">
+                @* Phía khách hàng: area = "" (không thuộc Area Admin) *@
+                @Html.ActionLink("MyStore", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li>@Html.ActionLink("Trang chủ", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                        @* Giỏ hàng + số lượng mặt hàng *@
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("MyOrder", "Order", new { area = "" })">Đơn hàng</a>
+                            <a class="nav-link" href="@Url.Action("Index", "Cart", new { area = "" })">
+                                Giỏ hàng
+                                @if (cartCount > 0)
+                                {
+                                    <span class="badge bg-danger">@cartCount</span>
+                                }
+                            </a>
                         </li>
-                    }
-                    @* Tài khoản: menu thay đổi theo trạng thái đăng nhập *@
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            @if (isLoggedIn)
-                            {
-                                <text>Hello, @User.Identity.Name</text>
-                            }
-                            else
-                            {
-                                <text>Tài khoản</text>
-                            }
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                            @if (isLoggedIn)
-                            {
-                                <li><a class="dropdown-item" href="@Url.Action("ProfileInfo", "Account", new { area = "" })">Thông tin tài khoản</a></li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <li><a class="dropdown-item" href="@Url.Action("Logout", "Account", new { area = "" })">Đăng xuất</a></li>
-                            }
-                            else
-                            {
-                                <li><a class="dropdown-item" href="@Url.Action("Register", "Account", new { area = "" })">Đăng ký</a></li>
-                                <li><a class="dropdown-item" href="@Url.Action("Login", "Account", new { area = "" })">Đăng nhập</a></li>
-                            }
-                        </ul>
-                    </li>
-                </ul>
-                @* Chỉ hiện khi truy cập từ chính máy chủ (localhost), không qua ngrok/proxy. Khách ở máy khác sẽ không thấy. *@
-                @if (Request.IsLocal && string.IsNullOrEmpty(Request.Headers["X-Forwarded-For"]))
-                {
-                    <ul class="navbar-nav">
-                        <li>@Html.ActionLink("Quay lại trang Admin", "Index", "AdminHome", new { area = "Admin" }, new { @class = "nav-link" })</li>
+                        @* Tài khoản: menu thay đổi theo trạng thái đăng nhập *@
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                @if (isLoggedIn)
+                                {
+                                    <text>Hello, @User.Identity.Name</text>
+                                }
+                                else
+                                {
+                                    <text>Tài khoản</text>
+                                }
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                                @if (isLoggedIn)
+                                {
+                                    <li><a class="dropdown-item" href="@Url.Action("ProfileInfo", "Account", new { area = "" })">Thông tin tài khoản</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("MyOrder", "Order", new { area = "" })">Lịch sử mua hàng</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Logout", "Account", new { area = "" })">Đăng xuất</a></li>
+                                }
+                                else
+                                {
+                                    <li><a class="dropdown-item" href="@Url.Action("Register", "Account", new { area = "" })">Đăng ký</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Login", "Account", new { area = "" })">Đăng nhập</a></li>
+                                }
+                            </ul>
+                        </li>
                     </ul>
-                }
+                    @* Chỉ hiện khi truy cập từ chính máy chủ (localhost). Khách ở máy khác sẽ không thấy. *@
+                    @if (Request.IsLocal)
+                    {
+                        <ul class="navbar-nav">
+                            <li>@Html.ActionLink("Quay lại trang Admin", "Index", "AdminHome", new { area = "Admin" }, new { @class = "nav-link" })</li>
+                        </ul>
+                    }
+                </div>
             </div>
+        </nav>
+        <div class="container body-content">
+            @RenderBody()
+            <hr />
+            <footer>
+                <p>&copy; @DateTime.Now.Year - Tên ứng dụng</p>
+                <h4>Contact</h4>
+                <p>Tên thành viên trong nhóm</p>
+            </footer>
         </div>
-    </nav>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - Tên ứng dụng</p>
-            <h4>Contact</h4>
-            <p>Tên thành viên trong nhóm</p>
-        </footer>
-    </div>
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
-</body>
-</html>
+        @Scripts.Render("~/bundles/jquery")
+        @Scripts.Render("~/bundles/bootstrap")
+        @RenderSection("scripts", required: false)
+    </body>
+    </html>

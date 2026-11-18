@@ -1,58 +1,322 @@
-﻿@model IEnumerable<BE_ThucHanh.Models.Order>
+﻿@model BE_ThucHanh.Models.ViewModel.MyOrderVM
+@using BE_ThucHanh.Models.ViewModel
 
 @{
-    ViewBag.Title = "Đơn hàng của tôi";
+    ViewBag.Title = "ĐƠN HÀNG CỦA TÔI";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-4">
-    <h2 class="mb-3">Đơn hàng của tôi</h2>
+<style>
+    /* Nền xám nhạt, các khối màu trắng giống slide */
+    .myorder-page {
+        background-color: #f5f5fa;
+        padding: 16px;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
 
-    @if (!Model.Any())
+    .myorder-title {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+    }
+
+    /* Tab trạng thái */
+    .myorder-tabs {
+        display: flex;
+        background-color: #fff;
+        border-bottom: 1px solid #e5e5e5;
+        margin-bottom: 12px;
+    }
+
+        .myorder-tabs a {
+            flex: 1;
+            text-align: center;
+            padding: 12px 6px;
+            color: #555;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-bottom: 2px solid transparent;
+        }
+
+            .myorder-tabs a:hover {
+                color: #0d6efd;
+            }
+
+            .myorder-tabs a.active {
+                color: #0d6efd;
+                border-bottom-color: #0d6efd;
+            }
+
+    /* Ô tìm kiếm */
+    .myorder-search {
+        display: flex;
+        align-items: center;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 0 12px;
+        margin-bottom: 14px;
+    }
+
+        .myorder-search .search-icon {
+            color: #888;
+            margin-right: 8px;
+        }
+
+        .myorder-search input[type=text] {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px 0;
+            font-size: 0.9rem;
+            background: transparent;
+        }
+
+        .myorder-search button {
+            border: none;
+            border-left: 1px solid #ddd;
+            background: transparent;
+            color: #0d6efd;
+            padding: 8px 0 8px 14px;
+            font-size: 0.9rem;
+        }
+
+    /* Thẻ đơn hàng */
+    .order-card {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+    }
+
+    .order-head {
+        color: #555;
+        font-size: 0.9rem;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 14px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-thumb {
+        position: relative;
+        width: 70px;
+        height: 70px;
+        margin-right: 14px;
+        flex-shrink: 0;
+    }
+
+        .order-thumb img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background: #fff;
+        }
+
+    .order-qty {
+        position: absolute;
+        right: -8px;
+        bottom: -4px;
+        background-color: #ececec;
+        color: #666;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .order-name {
+        color: #222;
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+
+        .order-name:hover {
+            color: #0d6efd;
+        }
+
+    .order-sub {
+        color: #888;
+        font-size: 0.8rem;
+        margin-top: 6px;
+    }
+
+    .order-price {
+        white-space: nowrap;
+        margin-left: 16px;
+        font-size: 0.95rem;
+    }
+
+    .order-total {
+        text-align: right;
+        margin-top: 14px;
+        color: #777;
+    }
+
+        .order-total strong {
+            color: #222;
+            font-size: 1.05rem;
+            margin-left: 4px;
+        }
+
+    .order-actions {
+        text-align: right;
+        margin-top: 10px;
+    }
+
+    .btn-order {
+        background-color: #fff;
+        border: 1px solid #0d6efd;
+        color: #0d6efd;
+        font-size: 0.85rem;
+        padding: 5px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-left: 6px;
+        display: inline-block;
+    }
+
+        .btn-order:hover {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+    .btn-more {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        color: #555;
+        font-size: 0.8rem;
+        padding: 4px 10px;
+        border-radius: 4px;
+        margin-top: 12px;
+    }
+</style>
+
+@* Một dòng sản phẩm trong đơn hàng *@
+@helper OrderItem(BE_ThucHanh.Models.OrderDetail d)
+{
+    <div class="order-item">
+        <div class="order-thumb">
+            <img src="@Url.Content(d.Product.ProductImage)" alt="@d.Product.ProductName" />
+            <span class="order-qty">x@(d.Quantity)</span>
+        </div>
+        <div class="flex-grow-1">
+            <a class="order-name" href="@Url.Action("ProductDetails", "Home", new { id = d.ProductID })">@d.Product.ProductName</a>
+            @if (d.Product.Category != null)
+            {
+                <div class="order-sub">Thể loại: @d.Product.Category.CategoryName</div>
+            }
+        </div>
+        <div class="order-price">@((d.UnitPrice * d.Quantity).ToString("N0")) ₫</div>
+    </div>
+}
+
+<div class="myorder-page">
+    <div class="myorder-title">Đơn hàng của tôi</div>
+
+    @* ------------ Các tab trạng thái ------------ *@
+    <div class="myorder-tabs">
+        <a class="@(Model.Tab == "all" ? "active" : "")"
+           href="@Url.Action("MyOrder", "Order", new { tab = "all", searchTerm = Model.SearchTerm })">Tất cả đơn</a>
+        @foreach (var st in OrderStatuses.List)
+        {
+            <a class="@(Model.Tab == st.Key ? "active" : "")"
+               href="@Url.Action("MyOrder", "Order", new { tab = st.Key, searchTerm = Model.SearchTerm })">@st.Name</a>
+        }
+    </div>
+
+    @* ------------ Phần Tìm kiếm đơn hàng ------------ *@
+    @using (Html.BeginForm("MyOrder", "Order", FormMethod.Get))
     {
-        <div class="alert alert-info">
-            Bạn chưa có đơn hàng nào. <a href="@Url.Action("Index", "Home")">Mua sắm ngay</a>
+        <input type="hidden" name="tab" value="@Model.Tab" />
+        <div class="myorder-search">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" name="searchTerm" value="@Model.SearchTerm"
+                   placeholder="Tìm đơn hàng theo Mã đơn hàng hoặc Tên sản phẩm" />
+            <button type="submit">Tìm đơn hàng</button>
+        </div>
+    }
+
+    @* ------------ Phần Đơn hàng của tôi ------------ *@
+    @if (!Model.Orders.Any() && string.IsNullOrWhiteSpace(Model.SearchTerm))
+    {
+        @* Chưa có đơn hàng nào: thông báo + link sang trang HOME *@
+        <div class="order-card text-center py-5">
+            <h5>BẠN CHƯA CÓ ĐƠN HÀNG NÀO. <a href="@Url.Action("Index", "Home")">HÃY ĐẶT ĐƠN NGAY.</a></h5>
+            <a href="@Url.Action("Index", "Home")" class="btn-order mt-3">Về trang chủ</a>
+        </div>
+    }
+    else if (!Model.Orders.Any())
+    {
+        @* Có nhập từ khóa nhưng không có đơn nào khớp *@
+        <div class="order-card text-center py-5 text-muted">
+            <h5>KHÔNG TÌM THẤY ĐƠN HÀNG PHÙ HỢP.</h5>
+            <a href="@Url.Action("MyOrder", "Order", new { tab = Model.Tab })" class="btn-order mt-3">Xóa tìm kiếm</a>
         </div>
     }
     else
     {
-        foreach (var o in Model)
+        foreach (var order in Model.Orders)
         {
-            <div class="card mb-3">
-                <div class="card-header d-flex justify-content-between">
-                    <span class="fw-bold">Đơn hàng #@o.OrderID</span>
-                    <span>@string.Format("{0:dd/MM/yyyy HH:mm}", o.OrderDate)</span>
+            var details = order.OrderDetails.ToList();
+            var shown = details.Take(2).ToList();
+            var rest = details.Skip(2).ToList();
+            var status = OrderStatuses.InfoOf(OrderStatuses.KeyOf(order.PaymentStatus));
+
+            <div class="order-card">
+                <div class="order-head d-flex justify-content-between">
+                    <span>@status.Icon&nbsp; @status.CardTitle</span>
+                    <span>Đơn hàng #@order.OrderID &middot; @order.OrderDate.ToString("dd/MM/yyyy")</span>
                 </div>
-                <div class="card-body">
-                    <p class="mb-1"><strong>Giao đến:</strong> @o.AddressDelivery</p>
-                    <p class="mb-2"><strong>Trạng thái:</strong> @o.PaymentStatus</p>
 
-                    <table class="table table-sm mb-2">
-                        <thead>
-                            <tr>
-                                <th>Sản phẩm</th>
-                                <th class="text-end">Đơn giá</th>
-                                <th class="text-center">SL</th>
-                                <th class="text-end">Thành tiền</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var d in o.OrderDetails)
-                            {
-                                <tr>
-                                    <td>@d.Product.ProductName</td>
-                                    <td class="text-end">@string.Format("{0:N0}", d.UnitPrice) đ</td>
-                                    <td class="text-center">@d.Quantity</td>
-                                    <td class="text-end">@string.Format("{0:N0}", d.UnitPrice * d.Quantity) đ</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
+                @foreach (var d in shown)
+                {
+                    @OrderItem(d)
+                }
 
-                    <div class="text-end fw-bold">
-                        Tổng tiền: <span class="text-danger">@string.Format("{0:N0}", o.TotalAmount) đ</span>
+                @if (rest.Any())
+                {
+                    <div class="collapse" id="more-@order.OrderID">
+                        @foreach (var d in rest)
+                        {
+                            @OrderItem(d)
+                        }
                     </div>
+                    <button class="btn-more" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#more-@order.OrderID">
+                        Xem thêm @rest.Count sản phẩm
+                    </button>
+                }
+
+                <div class="order-total">Tổng tiền: <strong>@order.TotalAmount.ToString("N0") ₫</strong></div>
+                <div class="order-actions">
+                    <a class="btn-order" href="@Url.Action("Reorder", "Order", new { id = order.OrderID })">Mua lại</a>
+                    @if (details.Any())
+                    {
+                        <a class="btn-order" href="@Url.Action("ProductDetails", "Home", new { id = details.First().ProductID })">Xem chi tiết</a>
+                    }
                 </div>
+            </div>
+        }
+
+        @* Tab theo trạng thái: chỉ hiện 2 đơn gần nhất, bấm "Xem thêm" để hiện tối đa 50 đơn *@
+        if (Model.Tab != "all" && Model.TotalInTab > 2)
+        {
+            <div class="text-center">
+                @if (!Model.ShowAll)
+                {
+                    <a class="btn-order" href="@Url.Action("MyOrder", "Order", new { tab = Model.Tab, searchTerm = Model.SearchTerm, showAll = true })">Xem thêm</a>
+                }
+                else
+                {
+                    <a class="btn-order" href="@Url.Action("MyOrder", "Order", new { tab = Model.Tab, searchTerm = Model.SearchTerm })">Thu gọn</a>
+                }
             </div>
         }
     }
