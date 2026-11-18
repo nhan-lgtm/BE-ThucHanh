@@ -1,0 +1,102 @@
+﻿@model BE_ThucHanh.Models.ViewModel.ProfileVM
+
+@{
+    ViewBag.Title = "Thông tin tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Thông tin tài khoản</h2>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row">
+        <!-- PHẦN 1: THÔNG TIN CÁ NHÂN (chỉ xem) -->
+        <div class="col-md-5 mb-4">
+            <div class="card">
+                <div class="card-header fw-bold">Thông tin cá nhân</div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Tên đăng nhập</dt>
+                        <dd class="col-sm-8">@Model.Username</dd>
+
+                        <dt class="col-sm-4">Họ tên</dt>
+                        <dd class="col-sm-8">@Model.CustomerName</dd>
+
+                        <dt class="col-sm-4">Số điện thoại</dt>
+                        <dd class="col-sm-8">@Model.CustomerPhone</dd>
+
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">@Model.CustomerEmail</dd>
+
+                        <dt class="col-sm-4">Địa chỉ</dt>
+                        <dd class="col-sm-8">@Model.CustomerAddress</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHẦN 2: THAY ĐỔI THÔNG TIN -->
+        <div class="col-md-7">
+            <div class="card mb-4">
+                <div class="card-header fw-bold">Cập nhật thông tin</div>
+                <div class="card-body">
+                    @using (Html.BeginForm("UpdateProfile", "Account", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.Username)
+                        @Html.HiddenFor(m => m.CustomerName)
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.CustomerPhone, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.CustomerPhone, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.CustomerPhone, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.CustomerEmail, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.CustomerEmail, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.CustomerEmail, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.CustomerAddress, new { @class = "form-label fw-bold" })
+                            @Html.TextBoxFor(m => m.CustomerAddress, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.CustomerAddress, "", new { @class = "text-danger" })
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    }
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header fw-bold">Đổi mật khẩu</div>
+                <div class="card-body">
+                    @using (Html.BeginForm("ChangePassword", "Account", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" for="OldPassword">Mật khẩu hiện tại</label>
+                            <input type="password" id="OldPassword" name="OldPassword" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" for="NewPassword">Mật khẩu mới</label>
+                            <input type="password" id="NewPassword" name="NewPassword" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" for="ConfirmPassword">Xác nhận mật khẩu mới</label>
+                            <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-control" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Đổi mật khẩu</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

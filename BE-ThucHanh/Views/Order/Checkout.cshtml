@@ -1,0 +1,78 @@
+﻿@model BE_ThucHanh.Models.Customer
+
+@{
+    ViewBag.Title = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cart = (BE_ThucHanh.Models.ViewModel.Cart)ViewBag.Cart;
+    decimal total = ViewBag.Total != null ? (decimal)ViewBag.Total : 0;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Thanh toán</h2>
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="row">
+        <!-- Danh sách sản phẩm -->
+        <div class="col-md-7 mb-4">
+            <div class="card">
+                <div class="card-header fw-bold">Đơn hàng của bạn</div>
+                <div class="card-body p-0">
+                    <table class="table mb-0 align-middle">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-center">SL</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in cart.Items)
+                            {
+                                <tr>
+                                    <td>@item.ProductName</td>
+                                    <td class="text-end">@string.Format("{0:N0}", item.UnitPrice) đ</td>
+                                    <td class="text-center">@item.Quantity</td>
+                                    <td class="text-end">@string.Format("{0:N0}", item.TotalPrice) đ</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Tổng cộng</th>
+                                <th class="text-end text-danger">@string.Format("{0:N0}", total) đ</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <a href="@Url.Action("Index", "Cart")" class="btn btn-link mt-2">&larr; Quay lại giỏ hàng</a>
+        </div>
+
+        <!-- Thông tin giao hàng -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header fw-bold">Thông tin giao hàng</div>
+                <div class="card-body">
+                    @using (Html.BeginForm("Checkout", "Order", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <p class="mb-1"><strong>Họ tên:</strong> @Model.CustomerName</p>
+                        <p class="mb-1"><strong>Số điện thoại:</strong> @Model.CustomerPhone</p>
+                        <p class="mb-3"><strong>Email:</strong> @Model.CustomerEmail</p>
+
+                        <div class="mb-3">
+                            <label for="addressDelivery" class="form-label fw-bold">Địa chỉ giao hàng</label>
+                            <input type="text" id="addressDelivery" name="addressDelivery"
+                                   class="form-control" value="@Model.CustomerAddress" />
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Xác nhận đặt hàng</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

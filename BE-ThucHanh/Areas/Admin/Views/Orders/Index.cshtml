@@ -1,0 +1,62 @@
+﻿@model IEnumerable<BE_ThucHanh.Models.Order>
+
+@{
+    ViewBag.Title = "Quản lý đơn hàng";
+    var statuses = (string[])ViewBag.Statuses;
+    string current = ViewBag.Status as string;
+}
+
+<h2 class="mb-3">Quản lý đơn hàng</h2>
+
+@using (Html.BeginForm("Index", "Orders", FormMethod.Get, new { @class = "row g-2 mb-3" }))
+{
+    <div class="col-auto">
+        <input type="text" name="q" value="@ViewBag.Q" class="form-control"
+               placeholder="Tìm theo tên / tài khoản khách" />
+    </div>
+    <div class="col-auto">
+        <select name="status" class="form-select">
+            <option value="">-- Tất cả trạng thái --</option>
+            @foreach (var s in statuses)
+            {
+                <option value="@s" @(s == current ? "selected" : "")>@s</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Lọc</button>
+    </div>
+}
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Mã đơn</th>
+            <th>Khách hàng</th>
+            <th>Ngày đặt</th>
+            <th>Trạng thái</th>
+            <th class="text-end">Tổng tiền</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var o in Model)
+        {
+            <tr>
+                <td>#@o.OrderID</td>
+                <td>@o.Customer.CustomerName <small class="text-muted">(@o.Customer.Username)</small></td>
+                <td>@string.Format("{0:dd/MM/yyyy HH:mm}", o.OrderDate)</td>
+                <td>@o.PaymentStatus</td>
+                <td class="text-end">@string.Format("{0:N0}", o.TotalAmount) đ</td>
+                <td class="text-end">
+                    <a href="@Url.Action("Details", new { id = o.OrderID })" class="btn btn-sm btn-info">Chi tiết</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">Không có đơn hàng nào.</p>
+}

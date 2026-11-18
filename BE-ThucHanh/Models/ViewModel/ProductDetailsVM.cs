@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using PagedList;
 
 namespace BE_ThucHanh.Models.ViewModel
 {
@@ -9,18 +10,21 @@ namespace BE_ThucHanh.Models.ViewModel
     {
         public Product product { get; set; }
         public int quantity { get; set; } = 1;
-        //Tính giá trị tạm thời
-        public decimal estimatedValue { get; set; } /*= quantity * product.ProductPrice*/
 
-        //Các thuộc tính hỗ trợ phân trang 
-        public int PageNumber { get; set; } //Trang hiện tại
-        public int PageSize { get; set; } = 3; //Số sản phẩm mỗi trang
+        // Tính giá trị tạm thời tự động (Số lượng x Giá sản phẩm)
+        public decimal estimatedValue
+        {
+            get { return quantity * (product != null ? product.ProductPrice : 0); }
+        }
 
-        //danh sách 8 sản phẩm cùng danh mục 
-        //public PagedList.IPagedList<Product> RelatedProducts { get; set; }
-        public List<Product> RelatedProducts { get; set; }
+        // Các thuộc tính hỗ trợ phân trang 
+        public int PageNumber { get; set; } // Trang hiện tại
+        public int PageSize { get; set; } = 3; // Số sản phẩm mỗi trang
 
-        //danh sách 8 sản phẩm bán chạy nhất cùng danh mục
-        public PagedList.IPagedList<Product> TopProducts { get; set; }
+        // Danh sách sản phẩm cùng danh mục 
+        public IPagedList<Product> RelatedProducts { get; set; }
+
+        // Danh sách sản phẩm bán chạy nhất cùng danh mục
+        public IPagedList<Product> TopProducts { get; set; }
     }
 }

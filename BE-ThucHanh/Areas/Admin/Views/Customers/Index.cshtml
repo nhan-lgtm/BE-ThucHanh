@@ -1,0 +1,61 @@
+﻿@model IEnumerable<BE_ThucHanh.Models.Customer>
+
+@{
+    ViewBag.Title = "Quản lý khách hàng";
+}
+
+<h2 class="mb-3">Quản lý khách hàng</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@using (Html.BeginForm("Index", "Customers", FormMethod.Get, new { @class = "mb-3" }))
+{
+    <div class="input-group" style="max-width:480px;">
+        <input type="text" name="q" value="@ViewBag.Q" class="form-control"
+               placeholder="Tìm theo tên, tài khoản, SĐT, email" />
+        <button type="submit" class="btn btn-primary">Tìm</button>
+    </div>
+}
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tài khoản</th>
+            <th>Họ tên</th>
+            <th>Số điện thoại</th>
+            <th>Email</th>
+            <th class="text-center">Số đơn</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.CustomerID</td>
+                <td>@c.Username</td>
+                <td>@c.CustomerName</td>
+                <td>@c.CustomerPhone</td>
+                <td>@c.CustomerEmail</td>
+                <td class="text-center">@c.Orders.Count</td>
+                <td class="text-end">
+                    <a href="@Url.Action("Details", new { id = c.CustomerID })" class="btn btn-sm btn-info">Chi tiết</a>
+                    <a href="@Url.Action("Edit", new { id = c.CustomerID })" class="btn btn-sm btn-warning">Sửa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">Không có khách hàng nào.</p>
+}

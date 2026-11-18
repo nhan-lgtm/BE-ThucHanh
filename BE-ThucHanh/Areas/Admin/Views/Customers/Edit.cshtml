@@ -1,0 +1,40 @@
+﻿@model BE_ThucHanh.Models.Customer
+
+@{
+    ViewBag.Title = "Sửa khách hàng";
+}
+
+<h2 class="mb-3">Sửa thông tin khách hàng</h2>
+
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+@using (Html.BeginForm("Edit", "Customers", new { id = Model.CustomerID }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div style="max-width:560px;">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Tên đăng nhập</label>
+            <input type="text" class="form-control" value="@Model.Username" disabled />
+        </div>
+        <div class="mb-3">
+            <label for="customerName" class="form-label fw-bold">Họ tên</label>
+            <input type="text" id="customerName" name="customerName" class="form-control" value="@Model.CustomerName" />
+        </div>
+        <div class="mb-3">
+            <label for="customerPhone" class="form-label fw-bold">Số điện thoại</label>
+            <input type="text" id="customerPhone" name="customerPhone" class="form-control" value="@Model.CustomerPhone" />
+        </div>
+        <div class="mb-3">
+            <label for="customerEmail" class="form-label fw-bold">Email</label>
+            <input type="text" id="customerEmail" name="customerEmail" class="form-control" value="@Model.CustomerEmail" />
+        </div>
+        <div class="mb-3">
+            <label for="customerAddress" class="form-label fw-bold">Địa chỉ</label>
+            <input type="text" id="customerAddress" name="customerAddress" class="form-control" value="@Model.CustomerAddress" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Lưu</button>
+        <a href="@Url.Action("Details", new { id = Model.CustomerID })" class="btn btn-secondary">Hủy</a>
+    </div>
+}

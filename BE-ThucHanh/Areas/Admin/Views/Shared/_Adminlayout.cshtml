@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - QUẢN TRỊ WEBSITE</title>
+    <title>@ViewBag.Title QUẢN TRỊ WEBSITE</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
@@ -23,7 +23,15 @@
                     <li>@Html.ActionLink("Sản phẩm", "Index", "Products", new { area = "Admin" }, new { @class = "nav-link" })</li>
                     <li>@Html.ActionLink("Khách hàng", "Index", "Customers", new { area = "Admin" }, new { @class = "nav-link" })</li>
                     <li>@Html.ActionLink("Đơn hàng", "Index", "Orders", new { area = "Admin" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("Tài khoản", "Index", "Users", new { area = "Admin" }, new { @class = "nav-link" })</li>
+                </ul>
+                <ul class="navbar-nav">
+                    @* Chỉ admin mới có link này: area = "" để ra khỏi Area Admin, mở tab mới *@
+                    <li>@Html.ActionLink("Xem cửa hàng", "Index", "Home", new { area = "" }, new { @class = "nav-link", target = "_blank" })</li>
+                    @if (Session["AdminUsername"] != null)
+                    {
+                        <li><span class="navbar-text px-2">Xin chào, @Session["AdminUsername"]</span></li>
+                        <li>@Html.ActionLink("Đăng xuất", "Logout", "AdminAccount", new { area = "Admin" }, new { @class = "nav-link" })</li>
+                    }
                 </ul>
             </div>
         </div>

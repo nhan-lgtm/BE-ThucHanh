@@ -8,6 +8,9 @@ namespace BE_ThucHanh
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
         {
             filters.Add(new HandleErrorAttribute());
+
+            // Chặn các trang trong khu Admin nếu chưa đăng nhập admin
+            filters.Add(new AdminAuthorizeAttribute());
         }
     }
 }

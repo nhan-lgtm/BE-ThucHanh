@@ -1,0 +1,59 @@
+﻿@model IEnumerable<BE_ThucHanh.Models.Order>
+
+@{
+    ViewBag.Title = "Đơn hàng của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Đơn hàng của tôi</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            Bạn chưa có đơn hàng nào. <a href="@Url.Action("Index", "Home")">Mua sắm ngay</a>
+        </div>
+    }
+    else
+    {
+        foreach (var o in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between">
+                    <span class="fw-bold">Đơn hàng #@o.OrderID</span>
+                    <span>@string.Format("{0:dd/MM/yyyy HH:mm}", o.OrderDate)</span>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Giao đến:</strong> @o.AddressDelivery</p>
+                    <p class="mb-2"><strong>Trạng thái:</strong> @o.PaymentStatus</p>
+
+                    <table class="table table-sm mb-2">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th class="text-end">Đơn giá</th>
+                                <th class="text-center">SL</th>
+                                <th class="text-end">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var d in o.OrderDetails)
+                            {
+                                <tr>
+                                    <td>@d.Product.ProductName</td>
+                                    <td class="text-end">@string.Format("{0:N0}", d.UnitPrice) đ</td>
+                                    <td class="text-center">@d.Quantity</td>
+                                    <td class="text-end">@string.Format("{0:N0}", d.UnitPrice * d.Quantity) đ</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <div class="text-end fw-bold">
+                        Tổng tiền: <span class="text-danger">@string.Format("{0:N0}", o.TotalAmount) đ</span>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

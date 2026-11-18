@@ -3,28 +3,48 @@
 @{
     ViewBag.Title = "Customer Home Page";
     <link rel="stylesheet" type="text/css" href="~/Content/MyStyle/CustomerHome.css" />
-}
-@* PHẦN BANNER*@
-<section class="container-fluid banner"
-         <div class="banner-container">
-             <h2>Chào mừng đến trang web E-commerce</h2>
-             <p>Mua sắm trực tuyến với hàng ngàn sản phẩm đa dạng và chất lượng</p>
-             <a href="#" class="btnBanner">Bắt đầu mua sắm</a>
-         </div>
-</section>
-@*PHẦN TÌM KIẾM SẢN PHẨM *@
-<section class="container-fluid searchProd">
-    <h2>Tìm kiếm sản phẩm</h2>
-    @using (Html.BeginForm("Index", "Home", "FormMethod.Get"))
-    {
-        <div class="form-group search-container">
-            @Html.TextBoxFor(m => m.SearchTerm, new {
-               @class = "search-input",
-               placeholder = "Nhập tên, mô tả hoặc chủng loại sản phẩm"
-       })
-            <button type="submit" class="search-button">Tìm kiếm</button>
-        </div>
-    }
-</section>
-<hr />
 
+}
+
+@section styles {
+    <link rel="stylesheet" type="text/css" href="~/Content/MyStyle/CustomerHome.css" />
+}
+
+<div class="container my-4">
+    @* PHẦN BANNER *@
+    <section class="banner mb-4 p-4 text-center rounded-3" style="background-color: #212529; min-height: 250px;">
+        <div class="banner-container">
+            <h2>Chào mừng đến trang web E-commerce</h2>
+            <p>Mua sắm trực tuyến với hàng ngàn sản phẩm đa dạng và chất lượng</p>
+            <a href="#featured-products" class="btn btn-primary btnBanner">Bắt đầu mua sắm</a>
+        </div>
+    </section>
+
+    @* PHẦN TÌM KIẾM SẢN PHẨM *@
+    <section class="searchProd mb-4">
+        <h2>Tìm kiếm sản phẩm</h2>
+        @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+        {
+            <div class="form-group search-container d-flex gap-2">
+                @Html.TextBoxFor(m => m.SearchTerm, new
+                {
+                    @class = "form-control search-input",
+                    placeholder = "Nhập tên, mô tả hoặc chủng loại sản phẩm"
+                })
+                <button type="submit" class="btn btn-primary search-button">Tìm kiếm</button>
+            </div>
+        }
+    </section>
+
+    <hr />
+
+    @* PHẦN SẢN PHẨM NỔI BẬT *@
+    <div id="featured-products" class="mb-4">
+        @Html.Partial("PVFeatureProduct", Model)
+    </div>
+
+    @* PHẦN SẢN PHẨM MỚI *@
+    <div class="mb-4">
+        @Html.Partial("PVNewProduct", Model)
+    </div>
+</div>
